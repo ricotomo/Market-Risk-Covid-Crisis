@@ -1,6 +1,5 @@
-<<<<<<< Updated upstream
 %% TEAM PROJECT
-load DATASET
+load('DATASET.mat')
 %Calculate Continuos Returns
 logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1));
 logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1));
@@ -18,7 +17,4 @@ xlabel('Time')
 ylabel('LogReturns')
 title('LogReturns STOXX600')
 %lets watch the distribution -> tails
-=======
-%% TEAM PROJECT 
-% 1) Historical simulation 
->>>>>>> Stashed changes
+
