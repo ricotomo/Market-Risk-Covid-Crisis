@@ -16,5 +16,33 @@ plot(Dates_eu(2:end),logReteuro,'r')
 xlabel('Time')
 ylabel('LogReturns')
 title('LogReturns STOXX600')
+% We can see volatility clustering 
 %lets watch the distribution -> tails
+figure(2)
+subplot(2,2,1)
+histfit(logReteuro)
+xlabel('logRet')
+ylabel('Frequency')
+title('Fitting Normal Distribution STOXX600')
+subplot(2,2,2)
+histfit(logRetSP500)
+xlabel('logRet')
+ylabel('Frequency')
+title('Fitting Normal Distribution SP500')
+subplot(2,2,3)
+histfit(logReteuro,100,'tlocationscale')
+xlabel('logRet')
+ylabel('Frequency')
+title('Fitting t-Distribution STOXX600')
+subplot(2,2,4)
+histfit(logRetSP500,100,'tlocationscale')
+xlabel('logRet')
+ylabel('Frequency')
+title('Fitting t-Distribution SP500')
+% we can see negative skewness (bigger losses) and kurtosis (fat tails),
+% t-student fits better 
+
+
+
+
 
