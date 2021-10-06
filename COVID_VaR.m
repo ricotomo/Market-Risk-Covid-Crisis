@@ -51,6 +51,7 @@ plot(alphaSorted, ProbLevelSorted);
 xlabel('(Rt-mu)./sigma')
 ylabel('Cumulative Probability')
 [ProbLevelSorted,alphaSorted]
+% test
 %% Compute VaR -- Check approximation when hp: mu=0
 clear alpha
 alpha=0.05;
