@@ -1,2 +1,2 @@
 %% TEAM PROJECT 
-% Andrea is retarded
+% GIAMPAOLO GAY
