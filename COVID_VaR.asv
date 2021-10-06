@@ -39,7 +39,39 @@ histfit(logRetSP500,100,'tlocationscale')
 xlabel('logRet')
 ylabel('Frequency')
 title('Fitting t-Distribution SP500')
-% we can see negative asymmetry
+% we can see negative skewness (bigger losses) and kurtosis (fat tails),
+% t-student fits better 
+
+
+
+%% Compute the VaR Using the Historical Simulation Method
+% Rolling historical VaR of Eurostoxx
+pVaR = [0.05 0.01];
+WS=22;
+for i=1:length(logReteuro)-WS
+    Historical_VaR95_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(1)); 
+    Historical_VaR99_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(2)); 
+end
+% Rolling historical VaR of SP500
+
+for i=1:length(logRetSP500)-WS
+    Historical_VaR95_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(1)); 
+    Historical_VaR99_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(2)); 
+end
+
+figure(3)
+plot(Dates_eu(23:end),Historical_VaR95_eu)
+hold
+plot(Dates_SP(23:end),Historical_VaR95_SP,'r')
+xlabel('Time')
+ylabel('VaR at 95%')
+title('Historical VaR at 95% US vs EU')
+legend('EU','US')
+
+
+
+
+
 
 
 

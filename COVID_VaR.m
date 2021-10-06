@@ -45,28 +45,34 @@ title('Fitting t-Distribution SP500')
 
 
 %% Compute the VaR Using the Historical Simulation Method
-% Unlike the normal distribution method, the historical simulation (HS) is
-% a nonparametric method. It does not assume a particular 
-% distribution of the asset returns. Historical simulation forecasts risk
-% by assuming that past profits and losses can be used as the distribution
-% of profits and losses for the next period of returns. The VaR "today" is computed as the 
-% _p_ th-quantile of the last  _N_  returns prior to "today."
+% Rolling historical VaR of Eurostoxx
+pVaR = [0.05 0.01];
+WS=22;
+for i=1:length(logReteuro)-WS
+    Historical_VaR95_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(1)); 
+    Historical_VaR99_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(2)); 
+end
+% Rolling historical VaR of SP500
 
-Historical95 = zeros(length(TestWindow),1);
-Historical99 = zeros(length(TestWindow),1);
-
-for t = TestWindow
-    i = t - TestWindowStart + 1;
-    EstimationWindow = t-EstimationWindowSize:t-1;
-    X = Returns(EstimationWindow);
-    Historical95(i) = -quantile(X,pVaR(1)); 
-    Historical99(i) = -quantile(X,pVaR(2)); 
+for i=1:length(logRetSP500)-WS
+    Historical_VaR95_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(1)); 
+    Historical_VaR99_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(2)); 
 end
 
-figure;
-plot(DateReturns(TestWindow),[Historical95 Historical99])
-ylabel('VaR')
-xlabel('Date')
-legend({'95% Confidence Level','99% Confidence Level'},'Location','Best')
-title('VaR Estimation Using the Historical Simulation Method')
+figure(3)
+plot(Dates_eu(24:end),Historical_VaR95_eu)
+hold
+plot(Dates_SP(24:end),Historical_VaR95_SP,'r')
+xlabel('Time')
+ylabel('VaR at 95%')
+title('Historical VaR at 95% US vs EU')
+legend('EU','US')
+
+
+
+
+
+
+
+
 
