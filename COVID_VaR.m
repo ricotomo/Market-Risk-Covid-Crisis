@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 %% TEAM PROJECT
 
 %Calculate Continuos Returns
@@ -17,3 +18,7 @@ xlabel('Time')
 ylabel('Returns')
 title('Returns STOXX600')
 %lets watch the distribution -> tails
+=======
+%% TEAM PROJECT 
+% 1) Historical simulation 
+>>>>>>> Stashed changes
