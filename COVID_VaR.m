@@ -1,5 +1,5 @@
 %% TEAM PROJECT
-
+load('DATASET.mat')
 %Calculate Continuos Returns
 logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1))
 logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1))
