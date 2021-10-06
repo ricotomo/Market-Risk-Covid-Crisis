@@ -44,5 +44,29 @@ title('Fitting t-Distribution SP500')
 
 
 
+%% Compute the VaR Using the Historical Simulation Method
+% Unlike the normal distribution method, the historical simulation (HS) is
+% a nonparametric method. It does not assume a particular 
+% distribution of the asset returns. Historical simulation forecasts risk
+% by assuming that past profits and losses can be used as the distribution
+% of profits and losses for the next period of returns. The VaR "today" is computed as the 
+% _p_ th-quantile of the last  _N_  returns prior to "today."
 
+Historical95 = zeros(length(TestWindow),1);
+Historical99 = zeros(length(TestWindow),1);
+
+for t = TestWindow
+    i = t - TestWindowStart + 1;
+    EstimationWindow = t-EstimationWindowSize:t-1;
+    X = Returns(EstimationWindow);
+    Historical95(i) = -quantile(X,pVaR(1)); 
+    Historical99(i) = -quantile(X,pVaR(2)); 
+end
+
+figure;
+plot(DateReturns(TestWindow),[Historical95 Historical99])
+ylabel('VaR')
+xlabel('Date')
+legend({'95% Confidence Level','99% Confidence Level'},'Location','Best')
+title('VaR Estimation Using the Historical Simulation Method')
 
