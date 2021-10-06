@@ -1,22 +1,22 @@
 <<<<<<< Updated upstream
 %% TEAM PROJECT
-
+load DATASET
 %Calculate Continuos Returns
-logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1))
-logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1))
+logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1));
+logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1));
 
 %% Display the Returns
 figure(1)
-plot(logRetSP500)
+subplot(2,1,1)
+plot(Dates_SP(2:end),logRetSP500)
 xlabel('Time')
-ylabel('Returns')
-title('Returns SP500')
-
-figure(2)
-plot(logReteuro)
+ylabel('LogReturns')
+title('LogReturns SP500')
+subplot(2,1,2)
+plot(Dates_eu(2:end),logReteuro,'r')
 xlabel('Time')
-ylabel('Returns')
-title('Returns STOXX600')
+ylabel('LogReturns')
+title('LogReturns STOXX600')
 %lets watch the distribution -> tails
 =======
 %% TEAM PROJECT 
