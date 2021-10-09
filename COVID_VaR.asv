@@ -1,6 +1,6 @@
 %% TEAM PROJECT
 load('DATASET.mat')
-%Calculate Continuos Returns
+%Calculate Continuous Returns
 logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1));
 logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1));
 
@@ -77,6 +77,19 @@ xlabel('Time')
 ylabel('VaR at 95%')
 title('Historical VaR at 95% US vs EU')
 legend('EU','US')
+%% Compute the VaR Using the parametric approach
+%the parametric VaR assumes that returns and volatility follow a normal
+%distribution
+
+%mu = mean / expected value
+mu_eu=mean(logReteuro)
+mu_sp=mean(logRetSP500)
+%z
+%Standard deviation
+std_eu=std(logReteuro)
+std_sp=std(logRetSP500)
+
+
 
 
 

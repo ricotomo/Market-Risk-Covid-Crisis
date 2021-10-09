@@ -1,6 +1,6 @@
 %% TEAM PROJECT
 load('DATASET.mat')
-%Calculate Continuos Returns
+%Calculate Continuous Returns
 logRetSP500=log(pt_SP500(2:end)./pt_SP500(1:end-1));
 logReteuro=log(pt_euro(2:end)./pt_euro(1:end-1));
 
@@ -77,6 +77,32 @@ xlabel('Time')
 ylabel('VaR at 95%')
 title('Historical VaR at 95% US vs EU')
 legend('EU','US')
+%% Testing the Normality assumption by Jarque-Bera test
+h_eu=jbtest(logReteuro);
+h_sp=jbtest(logRetSP500);
+%both return 1
+%this indicates that the test rejects the null hypothesis (kurtosis and
+%skewness are not 0 i.e. the distribution does not have a good normal fit)
+
+%% Compute the VaR Using the parametric approach
+%the parametric VaR assumes that returns and volatility follow a normal
+%distribution
+
+%mu = mean / expected value
+mu_eu=mean(logReteuro)
+mu_sp=mean(logRetSP500)
+
+%alpha
+conf_level=0.95;
+alpha=norminv(1-conf_level)
+
+%sigma=standard deviation
+sigma_eu=std(logReteuro)
+sigma_sp=std(logRetSP500)
+
+parametric_var_eu=mu_eu+alpha*sigma_eu
+
+
 
 %% Compute the VaR Using the Parametric Method
 
