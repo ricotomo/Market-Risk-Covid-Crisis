@@ -86,7 +86,29 @@ h_sp=jbtest(logRetSP500);
 
 %% Compute the VaR Using the parametric approach
 %the parametric VaR assumes that returns and volatility follow a normal
-%distribution
+%distribution, but due to the fact that past returns are not a good
+%benchmark for the new one, we want to have a really reactive method even
+%if we use normal assumption.
+figure(4)
+subplot(2,2,1)
+autocorr(logReteuro)
+title('Autocorrelation function logretEU')
+subplot(2,2,2)
+autocorr(logRetSP500)
+title('Autocorrelation function logretSP')
+subplot(2,2,3)
+autocorr(logReteuro.^2)
+title('Autocorrelation function squared logretEU')
+subplot(2,2,4)
+autocorr(logRetSP500.^2)
+title('Autocorrelation function squared logretSP')
+% As we can seen from the graph, there is autocorrelation among returns,
+% and also squared returns, so we have to model firstly the mean taking
+% into account some lags dependence and secondly ARCH effects on the
+% residuals.
+% we can compute the conditional mean by using a first order autoregressive
+% model--> AR(1): r(t)=Br(t-1)+e(t)
+
 
 %mu = mean / expected value
 mu_eu=mean(logReteuro)
@@ -104,7 +126,7 @@ parametric_var_eu=mu_eu+alpha*sigma_eu
 
 
 
-%% Compute the VaR Using the Parametric Method
+
 
 
 

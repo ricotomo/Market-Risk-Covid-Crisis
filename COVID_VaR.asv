@@ -53,7 +53,7 @@ kurtosis_SP=kurtosis(logRetSP500);
 % Main statistics of the two indexes
 table(mean_eu,mean_SP,std_eu,std_SP,skewness_eu,skewness_SP,kurtosis_eu,kurtosis_SP)
 % NB: we do expect higher VaR for the SP ptf because it has more
-% volatility(in this time horizon)than european one.
+% volatility(in this time horizon) than the european one.
 %% Compute the VaR Using the Historical Simulation Method
 % Rolling historical VaR of Eurostoxx
 pVaR = [0.05 0.01];
@@ -77,17 +77,50 @@ xlabel('Time')
 ylabel('VaR at 95%')
 title('Historical VaR at 95% US vs EU')
 legend('EU','US')
+%% Testing the Normality assumption by Jarque-Bera test
+h_eu=jbtest(logReteuro);
+h_sp=jbtest(logRetSP500);
+%both return 1
+%this indicates that the test rejects the null hypothesis (kurtosis and
+%skewness are not 0 i.e. the distribution does not have a good normal fit)
+
 %% Compute the VaR Using the parametric approach
 %the parametric VaR assumes that returns and volatility follow a normal
-%distribution
+%distribution, but due to the fact that past returns are not a good
+%benchmark for the new one, we want to have a really reactive method even
+%if we use normal assumption.
+figure(4)
+subplot(2,2,1)
+autocorr(logReteuro)
+title('Autocorrelation function logretEU')
+subplot(2,2,2)
+autocorr(logRetSP500)
+title('Autocorrelation function logretEU')
+subplot(2,2,3)
+autocorr(logReteuro.^2)
+title('Autocorrelation function squared logretEU')
+subplot(2,2,4)
+autocorr(logRetSP5
+
+% we can compute the conditional mean by using a first order autoregressive
+% model--> AR(1): r(t)=Br(t-1)+e(t)
+
 
 %mu = mean / expected value
 mu_eu=mean(logReteuro)
 mu_sp=mean(logRetSP500)
-%z
-%Standard deviation
-std_eu=std(logReteuro)
-std_sp=std(logRetSP500)
+
+%alpha
+conf_level=0.95;
+alpha=norminv(1-conf_level)
+
+%sigma=standard deviation
+sigma_eu=std(logReteuro)
+sigma_sp=std(logRetSP500)
+
+parametric_var_eu=mu_eu+alpha*sigma_eu
+
+
 
 
 
