@@ -121,13 +121,13 @@ title('Partial Autocorrelation function logretSP')
 % GARCH(1:1) variance of residuals to model autocorr.
 %% NOT READY
 mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
-WS=21;
+WS=22;
 SL=0.05;
 for i=1:length(logReteuro)-WS;
     fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
     [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
-    [muF,YMSE,sigmaF]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
-    Parametric_VaR95_eu(i)=abs(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF));
+    [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
+    Parametric_VaR95_eu(i)=-(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF);
 end
 
 %mu = mean / expected value
