@@ -41,9 +41,19 @@ ylabel('Frequency')
 title('Fitting t-Distribution SP500')
 % we can see negative skewness (bigger losses) and kurtosis (fat tails),
 % t-student fits better 
-
-
-
+% Compute Statistics
+mean_eu=mean(logReteuro);
+mean_SP=mean(logRetSP500);
+std_eu=std(logReteuro);
+std_SP=std(logRetSP500);
+skewness_eu=skewness(logReteuro);
+skewness_SP=skewness(logRetSP500);
+kurtosis_eu=kurtosis(logReteuro);
+kurtosis_SP=kurtosis(logRetSP500);
+% Main statistics of the two indexes
+table(mean_eu,mean_SP,std_eu,std_SP,skewness_eu,skewness_SP,kurtosis_eu,kurtosis_SP)
+% NB: we do expect higher VaR for the SP ptf because it has more
+% volatility(in this time horizon) than the european one.
 %% Compute the VaR Using the Historical Simulation Method
 % Rolling historical VaR of Eurostoxx
 pVaR = [0.05 0.01];
@@ -67,6 +77,8 @@ xlabel('Time')
 ylabel('VaR at 95%')
 title('Historical VaR at 95% US vs EU')
 legend('EU','US')
+
+%% Compute the VaR Using the Parametric Method
 
 
 
