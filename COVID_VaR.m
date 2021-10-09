@@ -88,7 +88,9 @@ h_sp=jbtest(logRetSP500);
 %the parametric VaR assumes that returns and volatility follow a normal
 %distribution, but due to the fact that past returns are not a good
 %benchmark for the new one, we want to have a really reactive method even
-%if we use normal assumption.
+%if we use normal assumption, that's not very realistic so we are going to
+%use t-distribution
+% ACF
 figure(4)
 subplot(2,2,1)
 autocorr(logReteuro)
@@ -102,13 +104,31 @@ title('Autocorrelation function squared logretEU')
 subplot(2,2,4)
 autocorr(logRetSP500.^2)
 title('Autocorrelation function squared logretSP')
+% PACF
+figure(5)
+subplot(2,1,1)
+parcorr(logReteuro)
+title('Partial Autocorrelation function logretEU')
+subplot(2,1,2)
+parcorr(logRetSP500)
+title('Partial Autocorrelation function logretSP')
+
 % As we can seen from the graph, there is autocorrelation among returns,
 % and also squared returns, so we have to model firstly the mean taking
 % into account some lags dependence and secondly ARCH effects on the
 % residuals.
-% we can compute the conditional mean by using a first order autoregressive
-% model--> AR(1): r(t)=Br(t-1)+e(t)
-
+% we can compute the conditional mean by using an ARMA(1,1) model with
+% GARCH(1:1) variance of residuals to model autocorr.
+%% NOT READY
+mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
+WS=21;
+SL=0.05;
+for i=1:length(logReteuro)-WS;
+    fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
+    [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
+    [muF,YMSE,sigmaF]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
+    Parametric_VaR95_eu(i)=abs(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF));
+end
 
 %mu = mean / expected value
 mu_eu=mean(logReteuro)
