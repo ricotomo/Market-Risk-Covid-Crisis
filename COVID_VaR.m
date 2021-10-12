@@ -1,5 +1,7 @@
 %% TEAM PROJECT
+
 load('DATASET.mat')
+
 %Calculate Continuous Returns
 logRetSP500=tick2ret(pt_SP500,'Method','continuous');
 logReteuro=tick2ret(pt_euro,'Method','continuous');
@@ -40,8 +42,8 @@ histfit(logRetSP500,100,'tlocationscale')
 xlabel('logRet')
 ylabel('Frequency')
 title('Fitting t-Distribution SP500')
-% From the plots we can see negative skewness (bigger losses) and kurtosis (fat tails) -> this confirm the stylized fact of assimetry in gain/losses
-% t-student fits better 
+% From the plots we can see negative skewness (bigger losses) and kurtosis (fat tails) -> this confirm the stylized fact of assimetry in gain/losses.
+% As we can notice from the graphs above, the t-student distribution fits better for both time series
 
 % Compute moments of distribution for both time series
 mean_eu=mean(logReteuro);
@@ -61,6 +63,7 @@ table(mean_eu,mean_SP,std_eu,std_SP,skewness_eu,skewness_SP,kurtosis_eu,kurtosis
 % Rolling historical VaR of Eurostoxx600
 pVaR = [0.05 0.01];
 WS=22;
+
 for i=1:length(logReteuro)-WS
     Historical_VaR95_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(1)); 
     Historical_VaR99_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(2)); 
@@ -82,6 +85,7 @@ title('Historical VaR at 95% US vs EU')
 legend('EU','US')
 
 %% Testing the Normality assumption by Jarque-Bera test
+
 h_eu=jbtest(logReteuro);
 h_sp=jbtest(logRetSP500);
 % Both return 1: this indicates that the test rejects the null hypothesis (kurtosis and
@@ -131,7 +135,8 @@ title('Partial Autocorrelation function logretSP')
 mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
 WS=22;
 SL=0.05;
-for i=1:length(logReteuro)-WS;
+
+for i=1:length(logReteuro)-WS
     fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
     [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
     [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
@@ -143,14 +148,16 @@ mu_eu=mean(logReteuro)
 mu_sp=mean(logRetSP500)
 
 %alpha
-conf_level=0.95;
-alpha=norminv(1-conf_level)
+
+z_alpha=norminv(SL);
 
 %sigma=standard deviation
-sigma_eu=std(logReteuro)
-sigma_sp=std(logRetSP500)
+sigma_eu=std(logReteuro);
+sigma_sp=std(logRetSP500);
 
-parametric_var_eu=mu_eu+alpha*sigma_eu
+parametric_var_eu=mu_eu+z_alpha*sigma_eu;
+
+parametric_var_sp=mu_sp+z_alpha*sigma_sp;
 
 
 
