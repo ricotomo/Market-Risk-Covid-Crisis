@@ -144,12 +144,25 @@ for i=1:length(logReteuro)-WS
 end
 
 %% Parametric VaR across whole sample assuming delta normal
+>>>>>>> Stashed changes
 
 %mu = mean / expected value
 mu_eu = mean(logReteuro);
 mu_sp = mean(logRetSP500);
 
 %alpha
+<<<<<<< Updated upstream
+
+z_alpha=norminv(SL);
+
+%sigma=standard deviation
+sigma_eu=std(logReteuro);
+sigma_sp=std(logRetSP500);
+
+parametric_var_eu=mu_eu+z_alpha*sigma_eu;
+
+parametric_var_sp=mu_sp+z_alpha*sigma_sp;
+=======
 conf_level=0.95;
 alph = norminv(1-conf_level);
 
@@ -202,6 +215,7 @@ xlabel('Time')
 ylabel('Return')
 legend('VaR','logReturns')
 
+>>>>>>> Stashed changes
 
 
 
