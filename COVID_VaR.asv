@@ -85,17 +85,16 @@ legend('EU','US')
 h_eu=jbtest(logReteuro);
 h_sp=jbtest(logRetSP500);
 % Both return 1: this indicates that the test rejects the null hypothesis (kurtosis and
-% skewness are not 0 -> the normal distribution doesn't represent a good fitting for both time series
+% skewness are not 0 -> the normal distribution doesn't 
+distribution does not have a good normal fit)
 
-%% Compute the VaR using the Parametric Approach
-
-% The parametric VaR assumes that returns and volatility follow a normal
-% distribution, but due to the fact that past returns are not a good
-% benchmark for the new one, we want to have a really reactive method even
-% if we use normal assumption, that's not very realistic so we are going to
-% use t-distribution
-
-% Display ACF
+%% Compute the VaR Using the parametric approach
+%the parametric VaR assumes that returns and volatility follow a normal
+%distribution, but due to the fact that past returns are not a good
+%benchmark for the new one, we want to have a really reactive method even
+%if we use normal assumption, that's not very realistic so we are going to
+%use t-distribution
+% ACF
 figure(4)
 subplot(2,2,1)
 autocorr(logReteuro)
@@ -109,8 +108,7 @@ title('Autocorrelation function squared logretEU')
 subplot(2,2,4)
 autocorr(logRetSP500.^2)
 title('Autocorrelation function squared logretSP')
-
-% Display PACF
+% PACF
 figure(5)
 subplot(2,1,1)
 parcorr(logReteuro)
@@ -119,15 +117,13 @@ subplot(2,1,2)
 parcorr(logRetSP500)
 title('Partial Autocorrelation function logretSP')
 
-% As we can see from the graphs, there is autocorrelation among returns,
+% As we can seen from the graph, there is autocorrelation among returns,
 % and also squared returns, so we have to model firstly the mean taking
 % into account some lags dependence and secondly ARCH effects on the
 % residuals.
-% We can compute the conditional mean by using an ARMA(1,1) model with
+% we can compute the conditional mean by using an ARMA(1,1) model with
 % GARCH(1:1) variance of residuals to model autocorr.
-
-%% NOT READY %%%
-
+%% NOT READY
 mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
 WS=22;
 SL=0.05;
