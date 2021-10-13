@@ -131,106 +131,6 @@ title('Partial Autocorrelation function logretSP')
 % We can compute the conditional mean by using an ARMA(1,1) model with
 % GARCH(1:1) variance of residuals to model autocorr.
 
-%% NOT READY %%%
-
-% mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
-% WS=22;
-% SL=0.05;
-% 
-% for i=1:length(logReteuro)-WS
-%     fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
-%     [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
-%     [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
-%     Parametric_VaR95_eu(i)=-(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF);
-% end
-
-%% Parametric VaR across whole sample assuming delta normal
-
-%mu = mean / expected value
-mu_eu = mean(logReteuro);
-mu_sp = mean(logRetSP500);
-
-%alpha
-conf_level=0.95;
-alph = norminv(1-conf_level);
-
-%sigma=standard deviation
-sigma_eu = std(logReteuro);
-sigma_sp = std(logRetSP500);
-
-parametric_var_eu = mu_eu+alph*sigma_eu;
-parametric_var_sp = mu_sp+alph*sigma_sp;
-%% Parametric VaR with rolling window assuming delta normal
-
-%set alpha
-conf_level = 0.95;
-alpha = norminv(1-conf_level);
-
-%set window size
-WS=22;
-
-%compute stats with rolling window for EU
-for i=1:length(logReteuro)-WS
-    logRet_eu_insample = logReteuro(i:i+WS-1);
-    sigma_eu_in_sample = std(logRet_eu_insample);
-    mu_eu_in_sample = mean(logRet_eu_insample);
-    VaR_eu_in_sample(i) = alpha*sigma_eu_in_sample+mu_eu_in_sample;
-end
-
-%compute stats with rolling window for USA
-for c=1:length(logRetSP500)-WS
-    logRet_sp_insample = logRetSP500(c:c+WS-1);
-    sigma_sp_in_sample = std(logRet_sp_insample);
-    mu_sp_in_sample = mean(logRet_sp_insample);
-    VaR_sp_in_sample(c) = alpha*sigma_sp_in_sample+mu_sp_in_sample;
-end
-
-figure(6)
-plot(VaR_eu_in_sample)
-hold
-bar(logReteuro(1+WS-1:end))
-title('Parametric VaR of EUROSTOXX600 using 22 day window')
-xlabel('Time')
-ylabel('Returns')
-legend('VaR','logReturns')
-
-figure(7)
-plot(VaR_sp_in_sample)
-hold
-bar(logRetSP500(1+WS-1:end))
-title('Parametric VaR of SP500 using 22 day window')
-xlabel('Time')
-ylabel('Return')
-legend('VaR','logReturns')
-
-%% Parametric VaR with simple moving avg - NOT READY 
-%time window for volaitility
-%also equals n in simple moving avgs equation
-WS_v=7;
-%for Paramteric VaR uses same alpha and ws from above
-
-%starting idex needs to be adjusted so we can compute volatitlity in window
-%prior
-for i=(WS_v+1):length(logReteuro)-WS
-    %volatility
-    logRet_eu_vol_insample=logReteuro(i-WS_v:i)
-    for t=2:length(logRet_eu_vol_insample)
-        r_var=logRet_eu_vol_insample(t)-logRet_eu_vol_insample(t-1)
-        r_var_sqr(t-1)=r_var*r_var
-    end
-    %can i do this to add all the elements in r_var_sqr?? What is this data
-    %structure called? 
-    sigma_vol_eu = sqrt(sum(r_var_sqr)/WS_v-1)
-    
-%     %parametric VaR
-%     %HOW DO WE ADJUST THIS WITH THE VOLATILITY FACTOR?
-%     logRet_eu_insample = logReteuro(i:i+WS-1);
-%     sigma_eu_in_sample = std(logRet_eu_insample);
-%     mu_eu_in_sample = mean(logRet_eu_insample);
-%     VaR_eu_in_sample(i) = alpha*sigma_eu_in_sample+mu_eu_in_sample;
-end
-
-
 %%  Set EWMA to estimate sigma for the Parametric Approach
 
 lambda = 0.95;
@@ -245,7 +145,7 @@ for i = 2 : (length(logRetSP500) - WS)
     var_EWMA95_sp(i) = -t_score*sigma_sp(i);
 end
 
-figure()
+figure(6)
 hold on
 bar(logRetSP500(23:end))
 plot(-var_EWMA95_sp, 'r')
@@ -265,7 +165,7 @@ for i = 2 : (length(logReteuro) - WS)
     var_EWMA95_eu(i) = -t_score*sigma_eu(i);
 end
 
-figure(1)
+figure(7)
 hold on
 bar(logReteuro(23:end))
 plot(-var_EWMA95_eu, 'r')
@@ -275,21 +175,29 @@ vbt2=varbacktest(logReteuro(23:end),var_EWMA95_eu');
 summary(vbt2)
 result2 = runtests(vbt2);
 
+%% EVT not ready
+ mdl1_eu=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
+ WS=500;
+ 
+ for i=1:length(logReteuro)-WS
+     fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
+     [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
+     [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
+ end
+ tail_fraction=0.05;
+ filter_residuals=residuals./sqrt(variances);
+ autocorr(filter_residuals(:,1))
+ for i=1:length(logReteuro)-WS
+     tails{i}=paretotails(filter_residuals(:,i),tail_fraction,1-tail_fraction,'kernel');
+ end
 
-%% GARCH codes %%%
-
-model_obj = garch(1,1); % create an obj which define the order of the GARCH model (could be even an ARCH if p=0)
-% Estimates model parameters
-par_estimates_sp = estimate(model_obj,logRetSP500); 
-par_estimates_eu = estimate(model_obj,logReteuro);
-% Compute conditional variances time series 
-cv_sp = infer(par_estimates_sp,logRetSP500); 
-cv_eu = infer(par_estimates_eu,logReteuro);
-
-% Then if we want to compute a forecasting:
-k = 10;
-sp_cv_forecast = forecast(par_estimates_sp,k,'Y0',logRetSP500);
-eu_cv_forecast = forecast(par_estimates_eu,k,'Y0',logReteuro);
+[P,Q] = boundary(tails{1});  % cumulative probabilities & quantiles at boundaries
+y     = sort(filter_residuals(filter_residuals(:,1) < Q(1),1) - Q(1)); % sort exceedances
+plot(y, (cdf(tails{1}, y + Q(1)) - P(1))/P(2))
+[F,x] = ecdf(y);                 % empirical CDF
+hold on
+stairs(x, F, 'r')
+grid on
 
 
 
