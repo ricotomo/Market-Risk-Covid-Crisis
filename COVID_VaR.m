@@ -231,7 +231,20 @@ end
 
 
 
+%% GARCH codes
 
+model_obj = garch(1,1); % create an obj which define the order of the GARCH model (could be even an ARCH if p=0)
+% Estimates model parameters
+par_estimates_sp = estimate(model_obj,logRetSP500); 
+par_estimates_eu = estimate(model_obj,logReteuro);
+% Compute conditional variances time series 
+cv_sp = infer(par_estimates_sp,logRetSP500); 
+cv_eu = infer(par_estimates_eu,logReteuro);
+
+% Then if we want to compute a forecasting:
+k = 10;
+sp_cv_forecast = forecast(par_estimates_sp,k,'Y0',logRetSP500);
+eu_cv_forecast = forecast(par_estimates_eu,k,'Y0',logReteuro);
 
 
 
