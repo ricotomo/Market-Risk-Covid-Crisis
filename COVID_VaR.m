@@ -230,8 +230,52 @@ for i=(WS_v+1):length(logReteuro)-WS
 end
 
 
+%%  Set EWMA to estimate sigma for the Parametric Approach
 
-%% GARCH codes
+lambda = 0.95;
+
+% VaR S&P500
+histfit(logRetSP500,50,'tlocationscale')
+t_score = tinv(0.05,5);
+ws = 22;
+
+for i = 2 : (length(logRetSP500) - WS)
+    sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
+    var_EWMA95_sp(i) = -t_score*sigma_sp(i);
+end
+
+figure()
+hold on
+bar(logRetSP500(23:end))
+plot(-var_EWMA95_sp, 'r')
+hold off
+
+vbt1=varbacktest(logRetSP500(23:end),var_EWMA95');
+summary(vbt)
+result1 = runtests(vbt);  
+
+% VaR Eurostoxx600
+histfit(logReteuro,50,'tlocationscale')
+t_score = tinv(0.05,4);
+ws = 22;
+
+for i = 2 : (length(logReteuro) - WS)
+    sigma_eu(i) = sqrt((1-lambda) * logReteuro(i-1)^2 + lambda * var(logReteuro(i:i+ws-1)));
+    var_EWMA95_eu(i) = -t_score*sigma_eu(i);
+end
+
+figure(1)
+hold on
+bar(logReteuro(23:end))
+plot(-var_EWMA95_eu, 'r')
+hold off
+
+vbt2=varbacktest(logReteuro(23:end),var_EWMA95_eu');
+summary(vbt2)
+result2 = runtests(vbt2);
+
+
+%% GARCH codes %%%
 
 model_obj = garch(1,1); % create an obj which define the order of the GARCH model (could be even an ARCH if p=0)
 % Estimates model parameters
