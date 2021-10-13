@@ -57,6 +57,7 @@ kurtosis_SP=kurtosis(logRetSP500);
 % Put them together into a table for a better visualization 
 table(mean_eu,mean_SP,std_eu,std_SP,skewness_eu,skewness_SP,kurtosis_eu,kurtosis_SP)
 % NB: we do expect higher VaR for the SP ptf, since it has more volatility in the considered time horizon than the european one.
+% VERIFY THE STYLIZED FACT OF VOLUME/VOLATILITY SIMMETRY  
 
 %% Compute the VaR using the Historical Simulation Method
 
