@@ -132,16 +132,16 @@ title('Partial Autocorrelation function logretSP')
 
 %% NOT READY %%%
 
-mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
-WS=22;
-SL=0.05;
-
-for i=1:length(logReteuro)-WS
-    fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
-    [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
-    [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
-    Parametric_VaR95_eu(i)=-(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF);
-end
+% mdl1_eu=arima('AR',NaN,'MA',NaN,'Distribution','t','Variance',gjr(1,1));
+% WS=22;
+% SL=0.05;
+% 
+% for i=1:length(logReteuro)-WS
+%     fit_eu{1,i}=estimate(mdl1_eu,logReteuro(i:i+WS-1));
+%     [residuals(:,i),variances(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
+%     [muF(i),YMSE(i),sigmaF(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
+%     Parametric_VaR95_eu(i)=-(muF(i)+sigmaF(i)*tinv(SL,fit_eu{1,i}.Distribution.DoF);
+% end
 
 %% Parametric VaR across whole sample assuming delta normal
 
@@ -201,6 +201,35 @@ title('Parametric VaR of SP500 using 22 day window')
 xlabel('Time')
 ylabel('Return')
 legend('VaR','logReturns')
+
+%% Parametric VaR with simple moving avg - NOT READY 
+%time window for volaitility
+%also equals n in simple moving avgs equation
+WS_v=7;
+%for Paramteric VaR uses same alpha and ws from above
+
+%starting idex needs to be adjusted so we can compute volatitlity in window
+%prior
+for i=(WS_v+1):length(logReteuro)-WS
+    %volatility
+    logRet_eu_vol_insample=logReteuro(i-WS_v:i)
+    for t=2:length(logRet_eu_vol_insample)
+        r_var=logRet_eu_vol_insample(t)-logRet_eu_vol_insample(t-1)
+        r_var_sqr(t-1)=r_var*r_var
+    end
+    %can i do this to add all the elements in r_var_sqr?? What is this data
+    %structure called? 
+    sigma_vol_eu = sqrt(sum(r_var_sqr)/WS_v-1)
+    
+%     %parametric VaR
+%     %HOW DO WE ADJUST THIS WITH THE VOLATILITY FACTOR?
+%     logRet_eu_insample = logReteuro(i:i+WS-1);
+%     sigma_eu_in_sample = std(logRet_eu_insample);
+%     mu_eu_in_sample = mean(logRet_eu_insample);
+%     VaR_eu_in_sample(i) = alpha*sigma_eu_in_sample+mu_eu_in_sample;
+end
+
+
 
 
 
