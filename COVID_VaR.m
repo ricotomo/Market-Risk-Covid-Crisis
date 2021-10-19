@@ -104,12 +104,23 @@ h_sp=jbtest(logRetSP500);
 
 lambda = 0.95;
 
+% Find the dof that fits best the data (fitting a t-student distribution)
+% SP timeseries
+pd_sp = fitdist(logRetSP500, 'tlocationscale');
+disp(pd_sp.nu)
+
+% euro timeseries
+pd_euro = fitdist(logReteuro, 'tlocationscale');
+disp(pd_euro.nu)
+
+% BTW we decide to choose dof of freedom equal to 3/4, since lower than 3 the variance wouldn't be finite 
+
 % VaR S&P500
 histfit(logRetSP500,50,'tlocationscale')
-t_score = tinv(0.05,5);
+t_score = tinv(0.05,4);
 ws = 22;
 
-for i = 2 : (length(logRetSP500) - WS)
+for i = 2 : (length(logRetSP500) - ws)
     sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
     var_EWMA95_sp(i) = -t_score*sigma_sp(i);
 end
@@ -125,7 +136,7 @@ histfit(logReteuro,50,'tlocationscale')
 t_score = tinv(0.05,4);
 ws = 22;
 
-for i = 2 : (length(logReteuro) - WS)
+for i = 2 : (length(logReteuro) - ws)
     sigma_eu(i) = sqrt((1-lambda) * logReteuro(i-1)^2 + lambda * var(logReteuro(i:i+ws-1)));
     var_EWMA95_eu(i) = -t_score*sigma_eu(i);
 end
@@ -190,23 +201,25 @@ plot(y, (cdf(tails{1}, y + Q(1)) - P(1))/P(2))
 hold on
 stairs(x, F, 'r')
 grid on
+
 %% BACKTESTING
-% historical back test US 
+% Historical back test US 
 vbt1=varbacktest(logRetSP500(23:end),Historical_VaR95_SP');
 summary(vbt1)
 result1 = runtests(vbt1); 
-% historical back test EU 
+% Historical back test EU 
 vbt2=varbacktest(logReteuro(23:end),Historical_VaR95_eu');
 summary(vbt2)
 result2 = runtests(vbt2);
-% parametric back test US
+
+% Parametric back test US
 vbt3=varbacktest(logRetSP500(23:end),var_EWMA95_sp');
 summary(vbt3)
-result1 = runtests(vbt3);  
-% parametric back test EU
+result3 = runtests(vbt3);  
+% Parametric back test EU
 vbt4=varbacktest(logReteuro(23:end),var_EWMA95_eu');
 summary(vbt4)
-result2 = runtests(vbt4);
+result4 = runtests(vbt4);
 
 
 
