@@ -113,11 +113,11 @@ disp(pd_sp.nu)
 pd_euro = fitdist(logReteuro, 'tlocationscale');
 disp(pd_euro.nu)
 
-% BTW we decide to choose dof of freedom equal to 3/4, since lower than 3 the variance wouldn't be finite 
+% Eventually we decide to choose dof of freedom equal to 3/4, since lower than 3 the variance wouldn't be finite 
 
 % VaR S&P500
 histfit(logRetSP500,50,'tlocationscale')
-t_score = tinv(0.05,4);
+t_score = tinv(0.05,3);
 ws = 22;
 
 for i = 2 : (length(logRetSP500) - ws)
@@ -133,7 +133,7 @@ hold off
 
 % VaR Eurostoxx600
 histfit(logReteuro,50,'tlocationscale')
-t_score = tinv(0.05,4);
+t_score = tinv(0.05,3);
 ws = 22;
 
 for i = 2 : (length(logReteuro) - ws)
