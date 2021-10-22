@@ -162,15 +162,6 @@ subplot(2,2,4)
 autocorr(logRetSP500.^2)
 title('Autocorrelation function squared logretSP')
 
-% Display PACF
-figure(5)
-subplot(2,1,1)
-parcorr(logReteuro)
-title('Partial Autocorrelation function logretEU')
-subplot(2,1,2)
-parcorr(logRetSP500)
-title('Partial Autocorrelation function logretSP')
-
 % As we can see from the graphs, there is autocorrelation among returns,
 % and also squared returns, so we have to model firstly the mean taking
 % into account some lags dependence and secondly ARCH effects on the
@@ -178,7 +169,7 @@ title('Partial Autocorrelation function logretSP')
 % We can compute the conditional mean by using an AR(1) model with
 % GARCH(1:1) variance of residuals to model autocorr.
 %% EXTREME VALUE THEORY
-% EVT GIUSTO 500 WS STOXX
+% EVT 500 WS STOXX
 % estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
  mdl1_eu=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
  WS=500;
@@ -227,7 +218,7 @@ title('Estimated vs empirical tail STOXX')
     VaR_90_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_90_evt_eu(i));
  end
 
-% EVT GIUSTO 500 WS S&P
+% EVT 500 WS S&P
 % estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
  mdl1_sp=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
  WS=500;
