@@ -301,6 +301,28 @@ xlabel('Time')
 ylabel('VaR EVT and  log-returns SP')
 title('VaR EVT vs log-returns SP')
 
+%% ANSWER TO THE SECOND RESEARCH QUESTION
+% we can see that during the covid crisis the evt is the best model
+figure(11)
+subplot(1,2,1)
+plot(Dates_eu(502:end),-VaR_90_evt_eu,'g-')
+hold
+bar(Dates_eu(502:end),logReteuro(501:end))
+plot(Dates_eu(502:end),-Historical_VaR90_eu(479:end),'b-')
+plot(Dates_eu(502:end),-var_EWMA90_eu(479:end),'m')
+xlabel('Time')
+ylabel('VaR at 90%')
+title('Comparison of models during Covid crisis')
+legend('VaR 90% EVT','Returns','VaR 90% Historical','VaR 90% EWMA')
+subplot(1,2,1)
+plot(Dates_SP(502:end),-VaR_90_evt_sp,'g-')
+hold
+bar(Dates_SP(502:end),logRetSP500(501:end))
+plot(Dates_SP(502:end),-Historical_VaR90_s(479:end),'b-')
+plot(Dates_SP(502:end),-var_EWMA90_eu(479:end),'m')
+
+
+
 %% BACKTESTING
 % Historical back test US 
 vbt1=varbacktest(logRetSP500(23:end),Historical_VaR95_SP');
@@ -321,10 +343,10 @@ summary(vbt4)
 result4 = runtests(vbt4);
 
 % EVT back test SP
-vbt_evt_sp=varbacktest(logRetSP500(501:end),VaR_90_evt_sp');
+vbt_evt_sp=varbacktest(logRetSP500(501:end),VaR_90_evt_sp','VaRLevel',.90);
 summary(vbt_evt_sp)
 % EVT back test EU
-vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu');
+vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
 summary(vbt_evt_eu)
 
 
