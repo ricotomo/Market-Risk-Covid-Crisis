@@ -62,18 +62,18 @@ table(mean_eu,mean_SP,std_eu,std_SP,skewness_eu,skewness_SP,kurtosis_eu,kurtosis
 %% Compute the VaR using the Historical Simulation Method
 
 % Rolling historical VaR of Eurostoxx600
-pVaR = [0.05 0.01];
+pVaR = [0.05 0.1];
 WS=22;
 
 for i=1:length(logReteuro)-WS
     Historical_VaR95_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(1)); 
-    Historical_VaR99_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(2)); 
+    Historical_VaR90_eu(i) = -quantile(logReteuro(i:i+WS-1),pVaR(2)); 
 end
 
 % Rolling historical VaR of S&P500
 for i=1:length(logRetSP500)-WS
     Historical_VaR95_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(1)); 
-    Historical_VaR99_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(2)); 
+    Historical_VaR90_SP(i) = -quantile(logRetSP500(i:i+WS-1),pVaR(2)); 
 end
 
 figure(3)
@@ -116,6 +116,7 @@ disp(pd_euro.nu)
 % Eventually we decide to choose dof of freedom equal to 3/4, since lower than 3 the variance wouldn't be finite 
 
 % VaR S&P500
+% 5%
 histfit(logRetSP500,50,'tlocationscale')
 t_score = tinv(0.05,3);
 ws = 22;
@@ -124,7 +125,14 @@ for i = 2 : (length(logRetSP500) - ws)
     sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
     var_EWMA95_sp(i) = -t_score*sigma_sp(i);
 end
+% 10%
+t_score = tinv(0.1,3);
+ws = 22;
 
+for i = 2 : (length(logRetSP500) - ws)
+    sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
+    var_EWMA90_sp(i) = -t_score*sigma_sp(i);
+end
 figure(6)
 hold on
 bar(logRetSP500(23:end))
@@ -132,6 +140,7 @@ plot(-var_EWMA95_sp, 'r')
 hold off
 
 % VaR Eurostoxx600
+% 5%
 histfit(logReteuro,50,'tlocationscale')
 t_score = tinv(0.05,3);
 ws = 22;
@@ -141,6 +150,15 @@ for i = 2 : (length(logReteuro) - ws)
     var_EWMA95_eu(i) = -t_score*sigma_eu(i);
 end
 
+% 10%
+histfit(logReteuro,50,'tlocationscale')
+t_score = tinv(0.1,3);
+ws = 22;
+
+for i = 2 : (length(logReteuro) - ws)
+    sigma_eu(i) = sqrt((1-lambda) * logReteuro(i-1)^2 + lambda * var(logReteuro(i:i+ws-1)));
+    var_EWMA90_eu(i) = -t_score*sigma_eu(i);
+end
 figure(7)
 hold on
 bar(logReteuro(23:end))
@@ -223,7 +241,7 @@ title('Estimated vs empirical tail STOXX')
  mdl1_sp=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
  WS=500;
  
- for i=1:length(logReteuro)-WS
+ for i=1:length(logRetSP500)-WS
      fit_sp{1,i}=estimate(mdl1_sp,logRetSP500(i:i+WS-1));
      [residuals_sp(:,i),variances_sp(:,i)]=infer(fit_sp{1,i},logRetSP500(i:i+WS-1));
      [muF_sp(i),YMSE_sp(i),sigmaF_sp(i)]=forecast(fit_sp{1,i},1,logRetSP500(i:i+WS-1));
