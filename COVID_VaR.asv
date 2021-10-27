@@ -305,10 +305,17 @@ figure(11)
 plot(Dates_eu(502:end),VaR_90_evt_eu)
 hold
 plot(Dates_SP(502:end),VaR_90_evt_sp)
-xlabel('Time')
+xlabel('Times')
 ylabel('VaR 90%')
-title('VaR 95% STOXX vs SP500')
-legend('STOXX','S&P500')
+title('VaR 95% 
+
+
+
+
+
+
+
+
 %% ANSWER TO THE SECOND RESEARCH QUESTION (RISK HYPOTHESIS)
 % we can see that during the covid crisis the evt is the best model
 figure(12)
