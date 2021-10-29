@@ -133,11 +133,14 @@ for i = 2 : (length(logRetSP500) - ws)
     sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
     var_EWMA90_sp(i) = -t_score*sigma_sp(i);
 end
-figure(6)
-hold on
-bar(logRetSP500(23:end))
-plot(-var_EWMA95_sp, 'r')
-hold off
+figure(4)
+bar(Dates_eu(24:end),logRetSP500(23:end))
+hold
+plot(Dates_eu(24:end),-var_EWMA95_sp, 'r')
+xlabel('Time')
+ylabel('VaR EWMA 95%')
+title('VaR 95% vs returns SP500')
+
 
 % VaR Eurostoxx600
 % 5%
@@ -159,14 +162,16 @@ for i = 2 : (length(logReteuro) - ws)
     sigma_eu(i) = sqrt((1-lambda) * logReteuro(i-1)^2 + lambda * var(logReteuro(i:i+ws-1)));
     var_EWMA90_eu(i) = -t_score*sigma_eu(i);
 end
-figure(7)
-hold on
-bar(logReteuro(23:end))
-plot(-var_EWMA95_eu, 'r')
-hold off
+figure(5)
+bar(Dates_eu(24:end),logRetSP500(23:end))
+hold
+plot(Dates_eu(24:end),-var_EWMA95_eu, 'r')
+xlabel('Time')
+ylabel('VaR EWMA 95%')
+title('VaR 95% vs returns STOXX')
 
 %% Display ACF
-figure(4)
+figure(6)
 subplot(2,2,1)
 autocorr(logReteuro)
 title('Autocorrelation function logretEU')
@@ -197,44 +202,55 @@ title('Autocorrelation function squared logretSP')
      [residuals_eu(:,i),variances_eu(:,i)]=infer(fit_eu{1,i},logReteuro(i:i+WS-1));
      [muF_eu(i),YMSE_eu(i),sigmaF_eu(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
  end
+ 
+% VaR 90% (stoxx)
  % fitting filter residuals tail with GDP 
  tail_fraction_eu=0.1;
  filter_residuals_eu=residuals_eu./sqrt(variances_eu);
- figure(6)
+ figure(7)
  autocorr(filter_residuals_eu(:,1))
  for i=1:length(logReteuro)-WS
-     tails_eu{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
+     tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
- 
-% Adjusting residuals (exceedances) and the associated  cumulative probability
+ for i=1:length(logReteuro)-WS
+    [P(:,i),Q(:,i)]=boundary(tails_eu_90{i});
+    params(i,:)=lowerparams(tails_eu_90{i});
+ end
+% computing Dynamic VaR 90% 
 for i=1:length(logReteuro)-WS
-    x_sorted_eu(:,i)=sort(filter_residuals_eu(:,i));
- 
+    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1))
+[quantile_90_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
+ VaR_90_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_90_evt_eu(i));
 end
-  x_eu=x_sorted_eu(1:50,:);
-for i=1:length(logReteuro)-WS  
-    [F_y_eu(:,i)]=cdf(tails_eu{i},x_eu(:,i));
-    
-end
-F_x_eu=F_y_eu/0.1;
-
 % Fitted tail distribution vs empirical (for the first Window Size)
-[F_em_eu,x_em_eu] = ecdf(x_eu(:,1));   % empirical CDF
+x_sorted_eu=sort(filter_residuals_eu(:,1));
+x_eu=x_sorted_eu(1:N_u(1));
+F_y_eu=cdf(tails_eu_90{1},x_eu);
+F_x_eu=F_y_eu/0.1;
+[F_em_eu,x_em_eu] = ecdf(x_eu);   % empirical CDF
 figure(7)
-plot(x_eu(:,1),F_x_eu(:,1)); % estimated
+plot(x_eu,F_x_eu); % estimated
 hold on
-stairs(x_em_eu(:,1), F_em_eu(:,1), 'r.')
+stairs(x_em_eu, F_em_eu, 'r.')
 grid on
 xlabel('Residuals')
-ylabel('Probability/Frequency')
+ylabel('Cumulative Probability')
 title('Estimated vs empirical tail STOXX')
-
-% computing VaR with dynamic EVT     
+% VaR 95% (stoxx)
+ % fitting filter residuals tail with GDP 
+ tail_fraction_eu=0.05;
  for i=1:length(logReteuro)-WS
-    [~,idx5_eu(i)] = min(abs(F_x_eu(:,i)-0.1));
-    quantile_90_evt_eu(i)=x_eu(idx5_eu(i),i);
-    VaR_90_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_90_evt_eu(i));
+     tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
+ for i=1:length(logReteuro)-WS
+    [P(:,i),Q(:,i)]=boundary(tails_eu_95{i});
+    params(i,:)=lowerparams(tails_eu_95{i});
+end
+for i=1:length(logReteuro)-WS
+    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1))
+[quantile_95_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
+ VaR_95_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_95_evt_eu(i));
+end
 
 % EVT 500 WS S&P
 % estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
@@ -246,78 +262,106 @@ title('Estimated vs empirical tail STOXX')
      [residuals_sp(:,i),variances_sp(:,i)]=infer(fit_sp{1,i},logRetSP500(i:i+WS-1));
      [muF_sp(i),YMSE_sp(i),sigmaF_sp(i)]=forecast(fit_sp{1,i},1,logRetSP500(i:i+WS-1));
  end
+ % evt s&p 90%
  % fitting filter residuals tail with GDP 
  tail_fraction_sp=0.1;
  filter_residuals_sp=residuals_sp./sqrt(variances_sp);
  figure(8)
  autocorr(filter_residuals_sp(:,1))
  for i=1:length(logRetSP500)-WS
-     tails_sp{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
+     tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
  end
- 
- % Adjusting residuals (exceedances) and the associated  cumulative probability
+  for i=1:length(logRetSP500)-WS
+    [P(:,i),Q(:,i)]=boundary(tails_sp_90{i});
+    params(i,:)=lowerparams(tails_sp_90{i});
+  end
+ % computing dynamic EVT VaR 90%  
 for i=1:length(logRetSP500)-WS
-    x_sorted_sp(:,i)=sort(filter_residuals_sp(:,i));
- 
+    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1))
+[quantile_90_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
+ VaR_90_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_90_evt_sp(i));
 end
-  x_sp=x_sorted_sp(1:50,:);
-for i=1:length(logRetSP500)-WS  
-    [F_y_sp(:,i)]=cdf(tails_sp{i},x_sp(:,i));
-    
-end
-F_x_sp=F_y_sp/0.1;
-
 % Fitted tail distribution vs empirical (for the first Window Size)
-[F_em_sp,x_em_sp] = ecdf(x_sp(:,1));   % empirical CDF
+x_sorted_sp=sort(filter_residuals_sp(:,1));
+x_sp=x_sorted_sp(1:N_u(1));
+F_y_sp=cdf(tails_sp_90{1},x_sp);
+F_x_sp=F_y_sp/0.1;
+[F_em_sp,x_em_sp] = ecdf(x_sp);   % empirical CDF
 figure(9)
-plot(x_sp(:,1),F_x_sp(:,1)); % estimated
+plot(x_sp,F_x_sp); % estimated
 hold on
-stairs(x_em_sp(:,1), F_em_sp(:,1), 'r.')
+stairs(x_em_sp, F_em_sp, 'r.')
 grid on
 xlabel('Residuals')
-ylabel('Probability/Frequency')
-title('Estimated vs empirical tail SP500')
-
-% computing VaR with dynamic EVT     
- for i=1:length(logRetSP500)-WS
-    [~,idx5_sp(i)] = min(abs(F_x_sp(:,i)-0.1));
-    quantile_90_evt_sp(i)=x_sp(idx5_sp(i),i);
-    VaR_90_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_90_evt_sp(i));
+ylabel('Cumulative Probability')
+title('Estimated vs empirical tail SP&500')
+% VaR 95% S&P500
+ tail_fraction_sp=0.05;
+  for i=1:length(logRetSP500)-WS
+     tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
  end
-%% Display the results with returns for both
+ for i=1:length(logRetSP500)-WS
+    [P(:,i),Q(:,i)]=boundary(tails_sp_95{i});
+    params(i,:)=lowerparams(tails_sp_95{i});
+ end
+for i=1:length(logRetSP500)-WS
+    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1))
+[quantile_95_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
+ VaR_95_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_95_evt_sp(i));
+end
+
+%% Display the results with returns for both US and EU at 90% and 95%
 figure(10)
-subplot(1,2,1)
+subplot(2,2,1)
 plot(Dates_eu(502:end),-VaR_90_evt_eu)
 hold
 bar(Dates_eu(502:end),logReteuro(501:end))
 xlabel('Time')
-ylabel('VaR EVT and  log-returns EU')
-title('VaR EVT vs log-returns EU')
-subplot(1,2,2)
+ylabel('VaR EVT 90% and  log-returns EU')
+title('VaR EVT 90% vs log-returns EU')
+subplot(2,2,2)
 plot(Dates_SP(502:end),-VaR_90_evt_sp)
 hold
 bar(Dates_SP(502:end),logRetSP500(501:end))
 xlabel('Time')
-ylabel('VaR EVT and  log-returns SP')
-title('VaR EVT vs log-returns SP')
+ylabel('VaR EVT 90% and  log-returns SP')
+title('VaR EVT 90% vs log-returns SP')
+subplot(2,2,3)
+plot(Dates_eu(502:end),-VaR_95_evt_eu)
+hold
+bar(Dates_eu(502:end),logReteuro(501:end))
+xlabel('Time')
+ylabel('VaR EVT 95% and  log-returns EU')
+title('VaR EVT 95% vs log-returns EU')
+subplot(2,2,4)
+plot(Dates_eu(502:end),-VaR_95_evt_sp)
+hold
+bar(Dates_eu(502:end),logRetSP500(501:end))
+xlabel('Time')
+ylabel('VaR EVT 95% and  log-returns SP')
+title('VaR EVT 95% vs log-returns SP')
+
 %% ANSWER TO THE FIRST RESEARCH QUESTION (MARKET HYPOTHESIS)
 figure(11)
+subplot(1,2,1)
 plot(Dates_eu(502:end),VaR_90_evt_eu)
 hold
 plot(Dates_SP(502:end),VaR_90_evt_sp)
-xlabel('Times')
+xlabel('Time')
 ylabel('VaR 90%')
-title('VaR 95% 
-
-
-
-
-
-
-
-
+title('VaR 90% STOXX vs SP500')
+legend('STOXX','S&P500')
+subplot(1,2,2)
+plot(Dates_eu(502:end),VaR_95_evt_eu)
+hold
+plot(Dates_SP(502:end),VaR_95_evt_sp)
+xlabel('Time')
+ylabel('VaR 95%')
+title('VaR 95% STOXX vs SP500')
+legend('STOXX','S&P500')
 %% ANSWER TO THE SECOND RESEARCH QUESTION (RISK HYPOTHESIS)
 % we can see that during the covid crisis the evt is the best model
+% with 90%
 figure(12)
 subplot(1,2,1)
 plot(Dates_eu(502:end),-VaR_90_evt_eu,'g-')
@@ -339,33 +383,57 @@ xlabel('Time')
 ylabel('VaR at 90%')
 title('Comparison of models during Covid crisis S&P500')
 legend('VaR 90% EVT','Returns','VaR 90% Historical','VaR 90% EWMA')
+% with 95%
+figure(13)
+subplot(1,2,1)
+plot(Dates_eu(502:end),-VaR_95_evt_eu,'g-')
+hold
+bar(Dates_eu(502:end),logReteuro(501:end))
+plot(Dates_eu(502:end),-Historical_VaR95_eu(479:end),'b-')
+plot(Dates_eu(502:end),-var_EWMA95_eu(479:end),'m')
+xlabel('Time')
+ylabel('VaR at 95%')
+title('Comparison of models during Covid crisis STOXX')
+legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
+subplot(1,2,2)
+plot(Dates_SP(502:end),-VaR_95_evt_sp,'g-')
+hold
+bar(Dates_SP(502:end),logRetSP500(501:end))
+plot(Dates_SP(502:end),-Historical_VaR95_SP(479:end),'b-')
+plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'m')
+xlabel('Time')
+ylabel('VaR at 95%')
+title('Comparison of models during Covid crisis S&P500')
+legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
 
 
 %% BACKTESTING
 % Historical back test US 
-vbt1=varbacktest(logRetSP500(23:end),Historical_VaR95_SP');
-summary(vbt1)
-result1 = runtests(vbt1); 
+vbt_his_sp=varbacktest(logRetSP500(23:end),Historical_VaR90_SP','VaRLevel',.90);
+summary(vbt_his_sp)
+result_his_sp = runtests(vbt_his_sp); 
 % Historical back test EU 
-vbt2=varbacktest(logReteuro(23:end),Historical_VaR95_eu');
-summary(vbt2)
-result2 = runtests(vbt2);
+vbt_his_eu=varbacktest(logReteuro(23:end),Historical_VaR90_eu','VaRLevel',.90);
+summary(vbt_his_eu)
+result_his_eu = runtests(vbt_his_eu);
 
 % Parametric back test US
-vbt3=varbacktest(logRetSP500(23:end),var_EWMA95_sp');
-summary(vbt3)
-result3 = runtests(vbt3);  
+vbt_par_sp=varbacktest(logRetSP500(23:end),var_EWMA90_sp','VaRLevel',.90);
+summary(vbt_par_sp)
+result_par_sp = runtests(vbt_par_sp);  
 % Parametric back test EU
-vbt4=varbacktest(logReteuro(23:end),var_EWMA95_eu');
-summary(vbt4)
-result4 = runtests(vbt4);
+vbt_par_eu=varbacktest(logReteuro(23:end),var_EWMA90_eu','VaRLevel',.90);
+summary(vbt_par_eu)
+result_par_eu = runtests(vbt_par_eu);
 
 % EVT back test SP
 vbt_evt_sp=varbacktest(logRetSP500(501:end),VaR_90_evt_sp','VaRLevel',.90);
 summary(vbt_evt_sp)
+result_evt_sp = runtests(vbt_evt_sp);
 % EVT back test EU
 vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
 summary(vbt_evt_eu)
+result_evt_eu = runtests(vbt_evt_eu);
 
 
 
