@@ -117,7 +117,7 @@ disp(pd_euro.nu)
 
 % VaR S&P500
 % 5%
-histfit(logRetSP500,50,'tlocationscale')
+
 t_score = tinv(0.05,3);
 ws = 22;
 
@@ -134,9 +134,9 @@ for i = 2 : (length(logRetSP500) - ws)
     var_EWMA90_sp(i) = -t_score*sigma_sp(i);
 end
 figure(4)
-bar(Dates_eu(24:end),logRetSP500(23:end))
+bar(Dates_SP(24:end),logRetSP500(23:end))
 hold
-plot(Dates_eu(24:end),-var_EWMA95_sp, 'r')
+plot(Dates_SP(24:end),-var_EWMA95_sp, 'r')
 xlabel('Time')
 ylabel('VaR EWMA 95%')
 title('VaR 95% vs returns SP500')
@@ -144,7 +144,7 @@ title('VaR 95% vs returns SP500')
 
 % VaR Eurostoxx600
 % 5%
-histfit(logReteuro,50,'tlocationscale')
+
 t_score = tinv(0.05,3);
 ws = 22;
 
@@ -154,7 +154,7 @@ for i = 2 : (length(logReteuro) - ws)
 end
 
 % 10%
-histfit(logReteuro,50,'tlocationscale')
+
 t_score = tinv(0.1,3);
 ws = 22;
 
@@ -163,7 +163,7 @@ for i = 2 : (length(logReteuro) - ws)
     var_EWMA90_eu(i) = -t_score*sigma_eu(i);
 end
 figure(5)
-bar(Dates_eu(24:end),logRetSP500(23:end))
+bar(Dates_eu(24:end),logReteuro(23:end))
 hold
 plot(Dates_eu(24:end),-var_EWMA95_eu, 'r')
 xlabel('Time')
@@ -334,9 +334,9 @@ xlabel('Time')
 ylabel('VaR EVT 95% and  log-returns EU')
 title('VaR EVT 95% vs log-returns EU')
 subplot(2,2,4)
-plot(Dates_eu(502:end),-VaR_95_evt_sp)
+plot(Dates_SP(502:end),-VaR_95_evt_sp)
 hold
-bar(Dates_eu(502:end),logRetSP500(501:end))
+bar(Dates_SP(502:end),logRetSP500(501:end))
 xlabel('Time')
 ylabel('VaR EVT 95% and  log-returns SP')
 title('VaR EVT 95% vs log-returns SP')
@@ -408,6 +408,7 @@ legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
 
 
 %% BACKTESTING
+% al 90%
 % Historical back test US 
 vbt_his_sp=varbacktest(logRetSP500(23:end),Historical_VaR90_SP','VaRLevel',.90);
 summary(vbt_his_sp)
@@ -434,6 +435,10 @@ result_evt_sp = runtests(vbt_evt_sp);
 vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
 summary(vbt_evt_eu)
 result_evt_eu = runtests(vbt_evt_eu);
+
+vbt_his_sp=varbacktest(logRetSP500(23:end),Historical_VaR90_SP','VaRLevel',.90);
+summary(vbt_his_sp)
+result_his_sp = runtests(vbt_his_sp); 
 
 
 

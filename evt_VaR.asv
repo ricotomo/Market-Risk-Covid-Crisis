@@ -1,9 +1,0 @@
-function [VaR] = evt_VaR(n,N_u,u,shape,scale,alpha);
-% this is the fuction for the esplicit formula of VaR with extreme value
-% theory method (POT)
-% the input are:
-% n that is a scalar representing the number of the sample
-% 
-VaR=u+(scale/shape)*(((n/N_u*alpha)^(-shape))-1);
-end
-
