@@ -448,21 +448,12 @@ result_his_eu_95 = runtests(vbt_his_eu_95);
 
 % Parametric back test US
 vbt_par_sp_95=varbacktest(logRetSP500(23:end),var_EWMA95_sp');
-summary(vbt_par_sp_95)
-result_par_sp_95 = runtests(vbt_par_sp_95);  
+summary(vbt_par_sp)
+result_par_sp = runtests(vbt_par_sp);  
 % Parametric back test EU
-vbt_par_eu_95=varbacktest(logReteuro(23:end),var_EWMA95_eu');
-summary(vbt_par_eu_95)
-result_par_eu_95 = runtests(vbt_par_eu_95);
-
-% EVT back test SP
-vbt_evt_sp_95=varbacktest(logRetSP500(501:end),VaR_95_evt_sp');
-summary(vbt_evt_sp_95)
-result_evt_sp_95 = runtests(vbt_evt_sp_95);
-% EVT back test EU
-vbt_evt_eu_95=varbacktest(logReteuro(501:end),VaR_95_evt_eu');
-summary(vbt_evt_eu_95)
-result_evt_eu_95 = runtests(vbt_evt_eu_95);
+vbt_par_eu=varbacktest(logReteuro(23:end),var_EWMA90_eu','VaRLevel',.90);
+summary(vbt_par_eu)
+result_par_eu = runtests(vbt_par_eu);
 
 
 
