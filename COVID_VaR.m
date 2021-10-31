@@ -218,7 +218,7 @@ title('Autocorrelation function squared logretSP')
  end
 % computing Dynamic VaR 90% 
 for i=1:length(logReteuro)-WS
-    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1))
+    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1));
 [quantile_90_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
  VaR_90_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_90_evt_eu(i));
 end
@@ -247,7 +247,7 @@ title('Estimated vs empirical tail STOXX')
     params(i,:)=lowerparams(tails_eu_95{i});
 end
 for i=1:length(logReteuro)-WS
-    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1))
+    N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1));
 [quantile_95_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
  VaR_95_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_95_evt_eu(i));
 end
@@ -277,7 +277,7 @@ end
   end
  % computing dynamic EVT VaR 90%  
 for i=1:length(logRetSP500)-WS
-    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1))
+    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1));
 [quantile_90_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
  VaR_90_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_90_evt_sp(i));
 end
@@ -305,7 +305,7 @@ title('Estimated vs empirical tail SP&500')
     params(i,:)=lowerparams(tails_sp_95{i});
  end
 for i=1:length(logRetSP500)-WS
-    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1))
+    N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1));
 [quantile_95_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
  VaR_95_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_95_evt_sp(i));
 end
@@ -435,10 +435,6 @@ result_evt_sp = runtests(vbt_evt_sp);
 vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
 summary(vbt_evt_eu)
 result_evt_eu = runtests(vbt_evt_eu);
-
-vbt_his_sp=varbacktest(logRetSP500(23:end),Historical_VaR90_SP','VaRLevel',.90);
-summary(vbt_his_sp)
-result_his_sp = runtests(vbt_his_sp); 
 
 
 
