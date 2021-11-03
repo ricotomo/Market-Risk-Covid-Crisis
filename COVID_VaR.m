@@ -78,12 +78,33 @@ end
 
 figure(3)
 plot(Dates_eu(24:end),Historical_VaR95_eu)
-hold
+hold on
 plot(Dates_SP(24:end),Historical_VaR95_SP,'r')
-xlabel('Time')
-ylabel('VaR at 95%')
-title('Historical VaR at 95% US vs EU')
-legend('EU','US')
+xlabel('Time','FontSize', 13)
+ylabel('VaR at 95%','FontSize', 13)
+title('Historical VaR at 95% US vs EU','FontSize', 15)
+legend('EU VaR','US VaR', 'FontSize', 13)
+hold off
+
+figure(4)
+subplot(1,2,1)
+hold on 
+bar(Dates_eu(502:end),logReteuro(501:end), 'r')
+plot(Dates_eu(502:end),-Historical_VaR95_eu(479:end),'b-')
+xlabel('Time','FontSize', 15)
+ylabel('VaR at 95%','FontSize', 15)
+title('Historical VaR w/ returns EU','FontSize',16)
+legend('Returns','Historical VaR 95%','FontSize', 13)
+hold off
+subplot(1,2,2)
+hold on
+bar(Dates_SP(502:end),logRetSP500(501:end), 'r')
+plot(Dates_SP(502:end),-Historical_VaR95_SP(479:end),'g-')
+xlabel('Time', 'FontSize',15)
+ylabel('VaR at 95%','FontSize', 15)
+title('Historical VaR w/ returns US','FontSize',16)
+legend('Returns','Historical VaR 95%','FontSize', 13)
+hold off
 
 %% Testing the Normality assumption by Jarque-Bera test
 
@@ -113,11 +134,11 @@ disp(pd_sp.nu)
 pd_euro = fitdist(logReteuro, 'tlocationscale');
 disp(pd_euro.nu)
 
-% Eventually we decide to choose dof of freedom equal to 3/4, since lower than 3 the variance wouldn't be finite 
+% Eventually we decide to choose dof of freedom equal to 3, since lower than 3 the variance wouldn't be finite 
 
 % VaR S&P500
-% 5%
 
+% 5% Confidence level 
 t_score = tinv(0.05,3);
 ws = 22;
 
@@ -125,7 +146,8 @@ for i = 2 : (length(logRetSP500) - ws)
     sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
     var_EWMA95_sp(i) = -t_score*sigma_sp(i);
 end
-% 10%
+
+% 10% Confidence level 
 t_score = tinv(0.1,3);
 ws = 22;
 
@@ -133,18 +155,10 @@ for i = 2 : (length(logRetSP500) - ws)
     sigma_sp(i) = sqrt((1-lambda) * logRetSP500(i-1)^2 + lambda * var(logRetSP500(i:i+ws-1)));
     var_EWMA90_sp(i) = -t_score*sigma_sp(i);
 end
-figure(4)
-bar(Dates_SP(24:end),logRetSP500(23:end))
-hold
-plot(Dates_SP(24:end),-var_EWMA95_sp, 'r')
-xlabel('Time')
-ylabel('VaR EWMA 95%')
-title('VaR 95% vs returns SP500')
-
 
 % VaR Eurostoxx600
-% 5%
 
+% 5% Confidence level
 t_score = tinv(0.05,3);
 ws = 22;
 
@@ -153,8 +167,7 @@ for i = 2 : (length(logReteuro) - ws)
     var_EWMA95_eu(i) = -t_score*sigma_eu(i);
 end
 
-% 10%
-
+% 10% Confidence level
 t_score = tinv(0.1,3);
 ws = 22;
 
@@ -162,16 +175,40 @@ for i = 2 : (length(logReteuro) - ws)
     sigma_eu(i) = sqrt((1-lambda) * logReteuro(i-1)^2 + lambda * var(logReteuro(i:i+ws-1)));
     var_EWMA90_eu(i) = -t_score*sigma_eu(i);
 end
+
 figure(5)
-bar(Dates_eu(24:end),logReteuro(23:end))
-hold
-plot(Dates_eu(24:end),-var_EWMA95_eu, 'r')
-xlabel('Time')
-ylabel('VaR EWMA 95%')
-title('VaR 95% vs returns STOXX')
+plot(Dates_eu(24:end),var_EWMA95_eu)
+hold on
+plot(Dates_SP(24:end),var_EWMA95_sp,'r')
+xlabel('Time','FontSize', 13)
+ylabel('VaR at 95%','FontSize', 13)
+title('Parametric VaR at 95% EU vs US','FontSize', 15)
+legend('EU VaR','US VaR', 'FontSize', 13)
+hold off
+
+figure(6)
+subplot(1,2,1)
+hold on 
+bar(Dates_eu(502:end),logReteuro(501:end), 'r')
+plot(Dates_eu(502:end),-var_EWMA95_eu(479:end),'b-')
+xlabel('Time','FontSize', 15)
+ylabel('VaR at 95%','FontSize', 15)
+title('Parametric VaR w/ returns EU','FontSize',16)
+legend('Returns','EWMA VaR 95%','FontSize', 13)
+hold off
+subplot(1,2,2)
+hold on
+bar(Dates_SP(502:end),logRetSP500(501:end), 'r')
+plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'g-')
+xlabel('Time', 'FontSize',15)
+ylabel('VaR at 95%','FontSize', 15)
+title('Parametric VaR w/ returns US','FontSize',16)
+legend('Returns','EWMA VaR 95%','FontSize', 13)
+hold off
 
 %% Display ACF
-figure(6)
+
+figure(7)
 subplot(2,2,1)
 autocorr(logReteuro)
 title('Autocorrelation function logretEU')
@@ -191,9 +228,11 @@ title('Autocorrelation function squared logretSP')
 % residuals.
 % We can compute the conditional mean by using an AR(1) model with
 % GARCH(1:1) variance of residuals to model autocorr.
+
 %% EXTREME VALUE THEORY
-% EVT 500 WS STOXX
-% estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
+
+% EVT STOXX, WS 500 
+% Estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
  mdl1_eu=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
  WS=500;
  
@@ -203,32 +242,38 @@ title('Autocorrelation function squared logretSP')
      [muF_eu(i),YMSE_eu(i),sigmaF_eu(i)]=forecast(fit_eu{1,i},1,logReteuro(i:i+WS-1));
  end
  
-% VaR 90% (stoxx)
- % fitting filter residuals tail with GDP 
+% VaR STOXX 90%
+% Fitting filter residuals tail with GDP 
  tail_fraction_eu=0.1;
  filter_residuals_eu=residuals_eu./sqrt(variances_eu);
- figure(7)
+ 
+ figure(8)
  autocorr(filter_residuals_eu(:,1))
+ 
  for i=1:length(logReteuro)-WS
      tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
+ 
  for i=1:length(logReteuro)-WS
     [P(:,i),Q(:,i)]=boundary(tails_eu_90{i});
     params(i,:)=lowerparams(tails_eu_90{i});
  end
-% computing Dynamic VaR 90% 
+ 
+% Computing Dynamic VaR 90% 
 for i=1:length(logReteuro)-WS
     N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1));
 [quantile_90_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
  VaR_90_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_90_evt_eu(i));
 end
+
 % Fitted tail distribution vs empirical (for the first Window Size)
 x_sorted_eu=sort(filter_residuals_eu(:,1));
 x_eu=x_sorted_eu(1:N_u(1));
 F_y_eu=cdf(tails_eu_90{1},x_eu);
 F_x_eu=F_y_eu/0.1;
 [F_em_eu,x_em_eu] = ecdf(x_eu);   % empirical CDF
-figure(7)
+
+figure(9)
 plot(x_eu,F_x_eu); % estimated
 hold on
 stairs(x_em_eu, F_em_eu, 'r.')
@@ -236,24 +281,28 @@ grid on
 xlabel('Residuals')
 ylabel('Cumulative Probability')
 title('Estimated vs empirical tail STOXX')
-% VaR 95% (stoxx)
- % fitting filter residuals tail with GDP 
+
+% VaR STOXX 95%
+% Fitting filter residuals tail with GDP 
  tail_fraction_eu=0.05;
+ 
  for i=1:length(logReteuro)-WS
      tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
+ 
  for i=1:length(logReteuro)-WS
     [P(:,i),Q(:,i)]=boundary(tails_eu_95{i});
     params(i,:)=lowerparams(tails_eu_95{i});
-end
+ end
+
 for i=1:length(logReteuro)-WS
     N_u(i)=length(filter_residuals_eu(filter_residuals_eu(:,i) < Q(1,i),1));
 [quantile_95_evt_eu(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
  VaR_95_evt_eu(i)=muF_eu(1,i)+sqrt(sigmaF_eu(1,i))*(-quantile_95_evt_eu(i));
 end
 
-% EVT 500 WS S&P
-% estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
+% EVT S&P, WS 500  
+% Estimate AR(1) and EGARCH(1;1) and forecasts for each WS of sigma and mu
  mdl1_sp=arima('AR',NaN,'Distribution','t','Variance',gjr(1,1));
  WS=500;
  
@@ -262,32 +311,39 @@ end
      [residuals_sp(:,i),variances_sp(:,i)]=infer(fit_sp{1,i},logRetSP500(i:i+WS-1));
      [muF_sp(i),YMSE_sp(i),sigmaF_sp(i)]=forecast(fit_sp{1,i},1,logRetSP500(i:i+WS-1));
  end
- % evt s&p 90%
- % fitting filter residuals tail with GDP 
+ 
+ % VaR S&P500 90%
+ % Fitting filter residuals tail with GDP 
  tail_fraction_sp=0.1;
  filter_residuals_sp=residuals_sp./sqrt(variances_sp);
- figure(8)
+ 
+ figure(10)
  autocorr(filter_residuals_sp(:,1))
+ 
  for i=1:length(logRetSP500)-WS
      tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
  end
+ 
   for i=1:length(logRetSP500)-WS
     [P(:,i),Q(:,i)]=boundary(tails_sp_90{i});
     params(i,:)=lowerparams(tails_sp_90{i});
   end
- % computing dynamic EVT VaR 90%  
+  
+ % Computing dynamic EVT VaR 90%  
 for i=1:length(logRetSP500)-WS
     N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1));
 [quantile_90_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.1);
  VaR_90_evt_sp(i)=muF_sp(1,i)+sqrt(sigmaF_sp(1,i))*(-quantile_90_evt_sp(i));
 end
+
 % Fitted tail distribution vs empirical (for the first Window Size)
 x_sorted_sp=sort(filter_residuals_sp(:,1));
 x_sp=x_sorted_sp(1:N_u(1));
 F_y_sp=cdf(tails_sp_90{1},x_sp);
 F_x_sp=F_y_sp/0.1;
 [F_em_sp,x_em_sp] = ecdf(x_sp);   % empirical CDF
-figure(9)
+
+figure(11)
 plot(x_sp,F_x_sp); % estimated
 hold on
 stairs(x_em_sp, F_em_sp, 'r.')
@@ -295,15 +351,19 @@ grid on
 xlabel('Residuals')
 ylabel('Cumulative Probability')
 title('Estimated vs empirical tail SP&500')
-% VaR 95% S&P500
+
+% VaR S&P500 95% 
  tail_fraction_sp=0.05;
+ 
   for i=1:length(logRetSP500)-WS
      tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
- end
+  end
+ 
  for i=1:length(logRetSP500)-WS
     [P(:,i),Q(:,i)]=boundary(tails_sp_95{i});
     params(i,:)=lowerparams(tails_sp_95{i});
  end
+ 
 for i=1:length(logRetSP500)-WS
     N_u(i)=length(filter_residuals_sp(filter_residuals_sp(:,i) < Q(1,i),1));
 [quantile_95_evt_sp(i)]=evt_VaR(WS,N_u(i),Q(1,i),params(i,1),params(i,2),0.05);
@@ -311,7 +371,8 @@ for i=1:length(logRetSP500)-WS
 end
 
 %% Display the results with returns for both US and EU at 90% and 95%
-figure(10)
+
+figure(12)
 subplot(2,2,1)
 plot(Dates_eu(502:end),-VaR_90_evt_eu)
 hold
@@ -342,7 +403,8 @@ ylabel('VaR EVT 95% and  log-returns SP')
 title('VaR EVT 95% vs log-returns SP')
 
 %% ANSWER TO THE FIRST RESEARCH QUESTION (MARKET HYPOTHESIS)
-figure(11)
+
+figure(13)
 subplot(1,2,1)
 plot(Dates_eu(502:end),VaR_90_evt_eu)
 hold
@@ -359,10 +421,11 @@ xlabel('Time')
 ylabel('VaR 95%')
 title('VaR 95% STOXX vs SP500')
 legend('STOXX','S&P500')
+
 %% ANSWER TO THE SECOND RESEARCH QUESTION (RISK HYPOTHESIS)
-% we can see that during the covid crisis the evt is the best model
-% with 90%
-figure(12)
+
+% We can see that during the covid crisis the evt is the best model with 90%
+figure(14)
 subplot(1,2,1)
 plot(Dates_eu(502:end),-VaR_90_evt_eu,'g-')
 hold
@@ -383,8 +446,9 @@ xlabel('Time')
 ylabel('VaR at 90%')
 title('Comparison of models during Covid crisis S&P500')
 legend('VaR 90% EVT','Returns','VaR 90% Historical','VaR 90% EWMA')
-% with 95%
-figure(13)
+
+% With 95%
+figure(15)
 subplot(1,2,1)
 plot(Dates_eu(502:end),-VaR_95_evt_eu,'g-')
 hold
@@ -406,9 +470,10 @@ ylabel('VaR at 95%')
 title('Comparison of models during Covid crisis S&P500')
 legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
 
-
 %% BACKTESTING
-%% at 90%
+
+% At 90% confidence level 
+
 % Historical back test US 
 vbt_his_sp=varbacktest(logRetSP500(23:end),Historical_VaR90_SP','VaRLevel',.90);
 summary(vbt_his_sp)
@@ -435,7 +500,8 @@ result_evt_sp = runtests(vbt_evt_sp);
 vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
 summary(vbt_evt_eu)
 result_evt_eu = runtests(vbt_evt_eu);
-%% at 95%
+
+% At 95% confidence level 
 
 % Historical back test US 
 vbt_his_sp_95=varbacktest(logRetSP500(23:end),Historical_VaR95_SP');
