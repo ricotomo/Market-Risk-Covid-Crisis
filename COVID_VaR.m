@@ -207,7 +207,6 @@ legend('Returns','EWMA VaR 95%','FontSize', 13)
 hold off
 
 %% Display ACF
-
 figure(7)
 subplot(2,2,1)
 autocorr(logReteuro)
@@ -350,7 +349,7 @@ stairs(x_em_sp, F_em_sp, 'r.')
 grid on
 xlabel('Residuals')
 ylabel('Cumulative Probability')
-title('Estimated vs empirical tail SP&500')
+title('Estimated vs empirical tail S&P500')
 
 % VaR S&P500 95% 
  tail_fraction_sp=0.05;
@@ -376,28 +375,28 @@ figure(12)
 subplot(2,2,1)
 plot(Dates_eu(502:end),-VaR_90_evt_eu)
 hold
-bar(Dates_eu(502:end),logReteuro(501:end))
+bar(Dates_eu(502:end),logReteuro(501:end),'r')
 xlabel('Time')
 ylabel('VaR EVT 90% and  log-returns EU')
 title('VaR EVT 90% vs log-returns EU')
 subplot(2,2,2)
 plot(Dates_SP(502:end),-VaR_90_evt_sp)
 hold
-bar(Dates_SP(502:end),logRetSP500(501:end))
+bar(Dates_SP(502:end),logRetSP500(501:end),'r')
 xlabel('Time')
 ylabel('VaR EVT 90% and  log-returns SP')
 title('VaR EVT 90% vs log-returns SP')
 subplot(2,2,3)
 plot(Dates_eu(502:end),-VaR_95_evt_eu)
 hold
-bar(Dates_eu(502:end),logReteuro(501:end))
+bar(Dates_eu(502:end),logReteuro(501:end),'r')
 xlabel('Time')
 ylabel('VaR EVT 95% and  log-returns EU')
 title('VaR EVT 95% vs log-returns EU')
 subplot(2,2,4)
 plot(Dates_SP(502:end),-VaR_95_evt_sp)
 hold
-bar(Dates_SP(502:end),logRetSP500(501:end))
+bar(Dates_SP(502:end),logRetSP500(501:end),'r')
 xlabel('Time')
 ylabel('VaR EVT 95% and  log-returns SP')
 title('VaR EVT 95% vs log-returns SP')
