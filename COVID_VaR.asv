@@ -250,7 +250,7 @@ title('Autocorrelation function squared logretSP')
  autocorr(filter_residuals_eu(:,1))
  
  for i=1:length(logReteuro)-WS
-     tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'ecdf');
+     tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu);
  end
  
  for i=1:length(logReteuro)-WS
@@ -286,7 +286,7 @@ title('Estimated vs empirical tail STOXX')
  tail_fraction_eu=0.05;
  
  for i=1:length(logReteuro)-WS
-     tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'ecdf');
+     tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu);
  end
  
  for i=1:length(logReteuro)-WS
@@ -320,7 +320,7 @@ end
  autocorr(filter_residuals_sp(:,1))
  
  for i=1:length(logRetSP500)-WS
-     tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'ecdf');
+     tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp);
  end
  
   for i=1:length(logRetSP500)-WS
@@ -355,7 +355,7 @@ title('Estimated vs empirical tail S&P500')
  tail_fraction_sp=0.05;
  
   for i=1:length(logRetSP500)-WS
-     tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'ecdf');
+     tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp);
   end
  
  for i=1:length(logRetSP500)-WS
