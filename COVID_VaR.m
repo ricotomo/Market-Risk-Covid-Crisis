@@ -180,10 +180,10 @@ figure(5)
 plot(Dates_eu(24:end),var_EWMA95_eu)
 hold on
 plot(Dates_SP(24:end),var_EWMA95_sp,'r')
-xlabel('Time','FontSize', 13)
-ylabel('VaR at 95%','FontSize', 13)
+xlabel('Time','FontSize', 15)
+ylabel('VaR at 95%','FontSize', 15)
 title('Parametric VaR at 95% EU vs US','FontSize', 15)
-legend('EU VaR','US VaR', 'FontSize', 13)
+legend('EU VaR','US VaR', 'FontSize', 15)
 hold off
 
 figure(6)
@@ -199,7 +199,7 @@ hold off
 subplot(1,2,2)
 hold on
 bar(Dates_SP(502:end),logRetSP500(501:end), 'r')
-plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'g-')
+plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'b-')
 xlabel('Time', 'FontSize',15)
 ylabel('VaR at 95%','FontSize', 15)
 title('Parametric VaR w/ returns US','FontSize',16)
@@ -250,7 +250,7 @@ title('Autocorrelation function squared logretSP')
  autocorr(filter_residuals_eu(:,1))
  
  for i=1:length(logReteuro)-WS
-     tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'ecdf');
+     tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
  
  for i=1:length(logReteuro)-WS
@@ -275,18 +275,18 @@ F_x_eu=F_y_eu/0.1;
 figure(9)
 plot(x_eu,F_x_eu); % estimated
 hold on
-stairs(x_em_eu, F_em_eu, 'r.')
+stairs(x_em_eu, F_em_eu, 'r.','MarkerSize',20)
 grid on
-xlabel('Residuals')
-ylabel('Cumulative Probability')
-title('Estimated vs empirical tail STOXX')
+xlabel('Residuals','FontSize',13)
+ylabel('Cumulative Probability','FontSize',13)
+title('Estimated vs empirical tail STOXX','FontSize',16)
 
 % VaR STOXX 95%
 % Fitting filter residuals tail with GDP 
  tail_fraction_eu=0.05;
  
  for i=1:length(logReteuro)-WS
-     tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'ecdf');
+     tails_eu_95{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
  end
  
  for i=1:length(logReteuro)-WS
@@ -320,7 +320,7 @@ end
  autocorr(filter_residuals_sp(:,1))
  
  for i=1:length(logRetSP500)-WS
-     tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'ecdf');
+     tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
  end
  
   for i=1:length(logRetSP500)-WS
@@ -345,17 +345,17 @@ F_x_sp=F_y_sp/0.1;
 figure(11)
 plot(x_sp,F_x_sp); % estimated
 hold on
-stairs(x_em_sp, F_em_sp, 'r.')
+stairs(x_em_sp, F_em_sp, 'r.','MarkerSize',20)
 grid on
-xlabel('Residuals')
-ylabel('Cumulative Probability')
-title('Estimated vs empirical tail S&P500')
+xlabel('Residuals','FontSize',13)
+ylabel('Cumulative Probability','FontSize',13)
+title('Estimated vs empirical tail S&P500','FontSize',16)
 
 % VaR S&P500 95% 
  tail_fraction_sp=0.05;
  
   for i=1:length(logRetSP500)-WS
-     tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'ecdf');
+     tails_sp_95{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
   end
  
  for i=1:length(logRetSP500)-WS
@@ -390,16 +390,16 @@ subplot(2,2,3)
 plot(Dates_eu(502:end),-VaR_95_evt_eu)
 hold
 bar(Dates_eu(502:end),logReteuro(501:end),'r')
-xlabel('Time')
-ylabel('VaR EVT 95% and  log-returns EU')
-title('VaR EVT 95% vs log-returns EU')
+xlabel('Time','FontSize',13)
+ylabel('VaR EVT 95% and  log-returns EU','FontSize',13)
+title('VaR EVT 95% vs log-returns EU','FontSize',16)
 subplot(2,2,4)
 plot(Dates_SP(502:end),-VaR_95_evt_sp)
 hold
 bar(Dates_SP(502:end),logRetSP500(501:end),'r')
-xlabel('Time')
-ylabel('VaR EVT 95% and  log-returns SP')
-title('VaR EVT 95% vs log-returns SP')
+xlabel('Time','FontSize',13)
+ylabel('VaR EVT 95% and  log-returns SP','FontSize',13)
+title('VaR EVT 95% vs log-returns SP','FontSize',16)
 
 %% ANSWER TO THE FIRST RESEARCH QUESTION (MARKET HYPOTHESIS)
 
@@ -449,21 +449,21 @@ legend('VaR 90% EVT','Returns','VaR 90% Historical','VaR 90% EWMA')
 % With 95%
 figure(15)
 subplot(1,2,1)
-plot(Dates_eu(502:end),-VaR_95_evt_eu,'g-')
+plot(Dates_eu(502:end-40),-VaR_95_evt_eu(1:end-40),'g-')
 hold
-bar(Dates_eu(502:end),logReteuro(501:end))
-plot(Dates_eu(502:end),-Historical_VaR95_eu(479:end),'b-')
-plot(Dates_eu(502:end),-var_EWMA95_eu(479:end),'m')
+bar(Dates_eu(502:end-40),logReteuro(501:end-40))
+plot(Dates_eu(502:end-40),-Historical_VaR95_eu(479:end-40),'b-')
+plot(Dates_eu(502:end-40),-var_EWMA95_eu(479:end-40),'m')
 xlabel('Time')
 ylabel('VaR at 95%')
 title('Comparison of models during Covid crisis STOXX')
 legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
 subplot(1,2,2)
-plot(Dates_SP(502:end),-VaR_95_evt_sp,'g-')
+plot(Dates_SP(502:end-40),-VaR_95_evt_sp(1:end-40),'g-')
 hold
-bar(Dates_SP(502:end),logRetSP500(501:end))
-plot(Dates_SP(502:end),-Historical_VaR95_SP(479:end),'b-')
-plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'m')
+bar(Dates_SP(502:end-40),logRetSP500(501:end-40))
+plot(Dates_SP(502:end-40),-Historical_VaR95_SP(479:end-40),'b-')
+plot(Dates_SP(502:end-40),-var_EWMA95_sp(479:end-40),'m')
 xlabel('Time')
 ylabel('VaR at 95%')
 title('Comparison of models during Covid crisis S&P500')
@@ -492,11 +492,11 @@ summary(vbt_par_eu)
 result_par_eu = runtests(vbt_par_eu);
 
 % EVT back test SP
-vbt_evt_sp=varbacktest(logRetSP500(501:end),VaR_90_evt_sp','VaRLevel',.90);
+vbt_evt_sp=varbacktest(logRetSP500(501:end),VaR_90_evt_sp(1:end)','VaRLevel',.90);
 summary(vbt_evt_sp)
 result_evt_sp = runtests(vbt_evt_sp);
 % EVT back test EU
-vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu','VaRLevel',.90);
+vbt_evt_eu=varbacktest(logReteuro(501:end),VaR_90_evt_eu(1:end)','VaRLevel',.90);
 summary(vbt_evt_eu)
 result_evt_eu = runtests(vbt_evt_eu);
 
@@ -521,14 +521,21 @@ summary(vbt_par_eu_95)
 result_par_eu_95 = runtests(vbt_par_eu_95);
 
 % EVT back test SP
-vbt_evt_sp_95=varbacktest(logRetSP500(501:end),VaR_95_evt_sp');
+vbt_evt_sp_95=varbacktest(logRetSP500(501:end),VaR_95_evt_sp(1:end)');
 summary(vbt_evt_sp_95)
 result_evt_sp_95 = runtests(vbt_evt_sp_95);
 % EVT back test EU
-vbt_evt_eu_95=varbacktest(logReteuro(501:end),VaR_95_evt_eu');
+vbt_evt_eu_95=varbacktest(logReteuro(501:end),VaR_95_evt_eu(1:end)');
 summary(vbt_evt_eu_95)
 result_evt_eu_95 = runtests(vbt_evt_eu_95);
 
+figure(16)
+plot(Dates_eu(1:500),Q(1,1).*ones(1,500),'r')
+hold
+plot(Dates_eu(1:500),filter_residuals_eu(:,1)','b.','MarkerSize',10)
+title('Peaks over the thresholds','FontSize',16)
+xlabel('Time','FontSize',13)
+ylabel('Filter Residuals','FontSize',13)
 
 
 
