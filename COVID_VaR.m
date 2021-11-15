@@ -248,6 +248,7 @@ title('Autocorrelation function squared logretSP')
  
  figure(8)
  autocorr(filter_residuals_eu(:,1))
+ title('Autocorrelation Standardized Residuals STOXX')
  
  for i=1:length(logReteuro)-WS
      tails_eu_90{i}=paretotails(filter_residuals_eu(:,i),tail_fraction_eu,1-tail_fraction_eu,'kernel');
@@ -275,7 +276,7 @@ F_x_eu=F_y_eu/0.1;
 figure(9)
 plot(x_eu,F_x_eu); % estimated
 hold on
-stairs(x_em_eu, F_em_eu, 'r.','MarkerSize',20)
+stairs(x_em_eu, F_em_eu, 'r.')
 grid on
 xlabel('Residuals','FontSize',13)
 ylabel('Cumulative Probability','FontSize',13)
@@ -318,6 +319,7 @@ end
  
  figure(10)
  autocorr(filter_residuals_sp(:,1))
+ title('Autocorrelation Standardized Residuals SP500')
  
  for i=1:length(logRetSP500)-WS
      tails_sp_90{i}=paretotails(filter_residuals_sp(:,i),tail_fraction_sp,1-tail_fraction_sp,'kernel');
@@ -345,7 +347,7 @@ F_x_sp=F_y_sp/0.1;
 figure(11)
 plot(x_sp,F_x_sp); % estimated
 hold on
-stairs(x_em_sp, F_em_sp, 'r.','MarkerSize',20)
+stairs(x_em_sp, F_em_sp, 'r.')
 grid on
 xlabel('Residuals','FontSize',13)
 ylabel('Cumulative Probability','FontSize',13)
@@ -449,21 +451,21 @@ legend('VaR 90% EVT','Returns','VaR 90% Historical','VaR 90% EWMA')
 % With 95%
 figure(15)
 subplot(1,2,1)
-plot(Dates_eu(502:end-40),-VaR_95_evt_eu(1:end-40),'g-')
+plot(Dates_eu(502:end),-VaR_95_evt_eu(1:end),'g-')
 hold
-bar(Dates_eu(502:end-40),logReteuro(501:end-40))
-plot(Dates_eu(502:end-40),-Historical_VaR95_eu(479:end-40),'b-')
-plot(Dates_eu(502:end-40),-var_EWMA95_eu(479:end-40),'m')
+bar(Dates_eu(502:end),logReteuro(501:end))
+plot(Dates_eu(502:end),-Historical_VaR95_eu(479:end),'b-')
+plot(Dates_eu(502:end),-var_EWMA95_eu(479:end),'m')
 xlabel('Time')
 ylabel('VaR at 95%')
 title('Comparison of models during Covid crisis STOXX')
 legend('VaR 95% EVT','Returns','VaR 95% Historical','VaR 95% EWMA')
 subplot(1,2,2)
-plot(Dates_SP(502:end-40),-VaR_95_evt_sp(1:end-40),'g-')
+plot(Dates_SP(502:end),-VaR_95_evt_sp(1:end),'g-')
 hold
-bar(Dates_SP(502:end-40),logRetSP500(501:end-40))
-plot(Dates_SP(502:end-40),-Historical_VaR95_SP(479:end-40),'b-')
-plot(Dates_SP(502:end-40),-var_EWMA95_sp(479:end-40),'m')
+bar(Dates_SP(502:end),logRetSP500(501:end))
+plot(Dates_SP(502:end),-Historical_VaR95_SP(479:end),'b-')
+plot(Dates_SP(502:end),-var_EWMA95_sp(479:end),'m')
 xlabel('Time')
 ylabel('VaR at 95%')
 title('Comparison of models during Covid crisis S&P500')
