@@ -7,5 +7,5 @@ Comparison of market risk in USA and Europe during COVID crisis. We implement an
 * Which Value at Risk method will most accurately model the COVID crisis?  
 
 # Findings  
-![](h1.png "Market risk was higher in the USA during COVID")  
-![](h2.png "Dynamic EVT best modeled the crisis")  
+![](h1.PNG "Market risk was higher in the USA during COVID")  
+![](h2.PNG "Dynamic EVT best modeled the crisis")  
